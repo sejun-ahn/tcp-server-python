@@ -4,9 +4,14 @@ from PyQt6 import uic, QtWidgets, QtNetwork
 from PyQt6.QtGui import QKeyEvent
 from PyQt6.QtCore import QThread, pyqtSignal, Qt
 
-def get_timestamp():
+def get_timestamp_log():
     date = datetime.now()
     return date.strftime("%H:%M:%S")+f".{date.microsecond//1000:03d}"
+
+def get_timestamp_tx():
+    date = datetime.now()
+    unix_timestamp = date.timestamp()
+    return unix_timestamp
 
 class ClientHandlerThread(QThread):
     message_received = pyqtSignal(str,tuple)
@@ -163,20 +168,22 @@ class TCPServerApp(QtWidgets.QMainWindow):
 
 
     def log_server_activated(self):
-        self.log_on_log(f"[{get_timestamp()}] Server activated")
+        self.log_on_log(f"[{get_timestamp_log()}] Server activated")
     def log_server_deactivated(self):
-        self.log_on_log(f"[{get_timestamp()}] Server deactivated")
+        self.log_on_log(f"[{get_timestamp_log()}] Server deactivated")
     def log_new_client(self, client_full_address):
-        self.log_on_log(f"[{get_timestamp()}][CO][{client_full_address[1]}] connected")
+        self.log_on_log(f"[{get_timestamp_log()}][CO][{client_full_address[1]}] connected")
     def log_del_client(self, client_full_address):
-        self.log_on_log(f"[{get_timestamp()}][CO][{client_full_address[1]}] disconnected")
+        self.log_on_log(f"[{get_timestamp_log()}][CO][{client_full_address[1]}] disconnected")
     def log_rx_message(self, message, client_full_address):
-        self.log_on_log(f"[{get_timestamp()}][RX][{client_full_address[1]}] {message}")
+        self.log_on_log(f"[{get_timestamp_log()}][RX][{client_full_address[1]}] {message}")
     def log_tx_message(self, message, client_full_address):
-        self.log_on_log(f"[{get_timestamp()}][TX][{client_full_address[1]}] {message}")
+        self.log_on_log(f"[{get_timestamp_log()}][TX][{client_full_address[1]}] {message}")
     
     def action_rx_message(self, message, client_full_address):
         self.log_rx_message(message, client_full_address)
+        if message == "ping":
+            self.tx_pong(client_full_address)
 
     def log_on_log(self, message):
         self.listWidget_log.addItem(message)
@@ -192,7 +199,14 @@ class TCPServerApp(QtWidgets.QMainWindow):
                     client_thread.client_socket.write(message.encode())
                     client_thread.client_socket.flush()
                     self.log_tx_message(message, client_thread.client_full_address)
-                    
+                   
+    def tx_pong(self, client_full_address):
+        for client_thread in self.client_threads:
+            if client_thread.client_full_address == client_full_address:
+                client_thread.client_socket.write(f"pong;{get_timestamp_tx()}".encode())
+                client_thread.client_socket.flush()
+                self.log_tx_message("pong", client_full_address)
+    
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
