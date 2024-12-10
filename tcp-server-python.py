@@ -1,7 +1,8 @@
 import sys, netifaces
 from datetime import datetime
 from PyQt6 import uic, QtWidgets, QtNetwork
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtGui import QKeyEvent
+from PyQt6.QtCore import QThread, pyqtSignal, Qt
 
 def get_timestamp():
     date = datetime.now()
@@ -68,7 +69,19 @@ class TCPServerApp(QtWidgets.QMainWindow):
         self.pushButton_sendStart.clicked.connect(lambda: self.broadcast_message_from_lineEdit(self.lineEdit_messageToSendToStart))
         self.pushButton_sendStop.clicked.connect(lambda: self.broadcast_message_from_lineEdit(self.lineEdit_messageToSendToStop))
         self.pushButton_clearLog.clicked.connect(lambda: self.listWidget_log.clear())
-
+    
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.key() == Qt.Key.Key_F1:
+            self.pushButton_sendStart.click()
+            print("F1")
+            event.accept()
+        elif event.key() == Qt.Key.Key_F2:
+            self.pushButton_sendStop.click()
+            print("F2")
+            event.accept()
+        else:
+            event.ignore()
+            
     def update_button_state(self):
         self.pushButton_serverActivate.setEnabled(not self.is_running)
         self.pushButton_serverDeactivate.setEnabled(self.is_running)
@@ -181,8 +194,11 @@ class TCPServerApp(QtWidgets.QMainWindow):
                     self.log_tx_message(message, client_thread.client_full_address)
                     
 
+def main():
+    app = QtWidgets.QApplication(sys.argv)
+    window = TCPServerApp()
+    window.show()
+    sys.exit(app.exec())
 
-app = QtWidgets.QApplication(sys.argv)
-window = TCPServerApp()
-window.show()
-sys.exit(app.exec())
+if __name__ == '__main__':
+    main()
