@@ -49,8 +49,8 @@ class TCPServerApp(QtWidgets.QMainWindow):
         self.listWidget_client = self.findChild(QtWidgets.QListWidget, 'listWidget_client')
         self.listWidget_log = self.findChild(QtWidgets.QListWidget, 'listWidget_log')
         self.lineEdit_messageToSend = self.findChild(QtWidgets.QLineEdit, 'lineEdit_messageToSend')
-        self.lineEdit_messageToSendToStart = self.findChild(QtWidgets.QLineEdit, 'lineEdit_messageToSendToStart')
-        self.lineEdit_messageToSendToStop = self.findChild(QtWidgets.QLineEdit, 'lineEdit_messageToSendToStop')
+        self.lineEdit_flagToSendToStart = self.findChild(QtWidgets.QLineEdit, 'lineEdit_flagToSendToStart')
+        self.lineEdit_flagToSendToStop = self.findChild(QtWidgets.QLineEdit, 'lineEdit_flagToSendToStop')
         self.pushButton_sendMessage = self.findChild(QtWidgets.QPushButton, 'pushButton_sendMessage')
         self.pushButton_sendStart = self.findChild(QtWidgets.QPushButton, 'pushButton_sendStart')
         self.pushButton_sendStop = self.findChild(QtWidgets.QPushButton, 'pushButton_sendStop')
@@ -71,8 +71,8 @@ class TCPServerApp(QtWidgets.QMainWindow):
         self.pushButton_serverActivate.clicked.connect(self.activate_server)
         self.pushButton_serverDeactivate.clicked.connect(self.deactivate_server)
         self.pushButton_sendMessage.clicked.connect(lambda: self.broadcast_message_from_lineEdit(self.lineEdit_messageToSend))
-        self.pushButton_sendStart.clicked.connect(lambda: self.broadcast_message_from_lineEdit(self.lineEdit_messageToSendToStart))
-        self.pushButton_sendStop.clicked.connect(lambda: self.broadcast_message_from_lineEdit(self.lineEdit_messageToSendToStop))
+        self.pushButton_sendStart.clicked.connect(lambda: self.broadcast_message_from_lineEdit(f"{self.lineEdit_flagToSendToStart.text()};{get_timestamp_tx()}"))
+        self.pushButton_sendStop.clicked.connect(lambda: self.broadcast_message_from_lineEdit(f"{self.lineEdit_flagToSendToStop.text()};{get_timestamp_tx()}"))
         self.pushButton_clearLog.clicked.connect(lambda: self.listWidget_log.clear())
     
     def keyPressEvent(self, event: QKeyEvent):
@@ -191,7 +191,10 @@ class TCPServerApp(QtWidgets.QMainWindow):
             self.listWidget_log.scrollToBottom()
 
     def broadcast_message_from_lineEdit(self, lineEdit):
-        message = lineEdit.text()
+        if type(lineEdit) == str:
+            message = lineEdit
+        else:
+            message = lineEdit.text()
         real_client_ids = self.client_items.keys()
         if message:
             for client_thread in self.client_threads:

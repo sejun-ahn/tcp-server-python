@@ -144,9 +144,9 @@
      </widget>
     </item>
     <item row="13" column="0" colspan="3">
-     <widget class="QLineEdit" name="lineEdit_messageToSendToStop">
+     <widget class="QLineEdit" name="lineEdit_flagToSendToStop">
       <property name="placeholderText">
-       <string>message to stop...</string>
+       <string>flag to trig stop...</string>
       </property>
      </widget>
     </item>
@@ -276,9 +276,9 @@
      </widget>
     </item>
     <item row="12" column="0" colspan="3">
-     <widget class="QLineEdit" name="lineEdit_messageToSendToStart">
+     <widget class="QLineEdit" name="lineEdit_flagToSendToStart">
       <property name="placeholderText">
-       <string>message to start...</string>
+       <string>flag to trig start...</string>
       </property>
      </widget>
     </item>
