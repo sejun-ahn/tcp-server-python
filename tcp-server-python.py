@@ -1,17 +1,11 @@
 import sys, netifaces
-from datetime import datetime
+
+from timestamp import *
 from PyQt6 import uic, QtWidgets, QtNetwork
 from PyQt6.QtGui import QKeyEvent
 from PyQt6.QtCore import QThread, pyqtSignal, Qt
 
-def get_timestamp_log():
-    date = datetime.now()
-    return date.strftime("%H:%M:%S")+f".{date.microsecond//1000:03d}"
 
-def get_timestamp_tx():
-    date = datetime.now()
-    unix_timestamp = date.timestamp()
-    return unix_timestamp
 
 class ClientHandlerThread(QThread):
     message_received = pyqtSignal(str,tuple)
