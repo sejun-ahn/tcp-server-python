@@ -176,7 +176,8 @@ class TCPServerApp(QtWidgets.QMainWindow):
     
     def action_rx_message(self, message, client_full_address):
         self.log_rx_message(message, client_full_address)
-        if message == "ping":
+        parsed_message = message.split(";")
+        if parsed_message[0] == "ping":
             self.tx_pong(client_full_address)
 
     def log_on_log(self, message):
