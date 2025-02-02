@@ -179,6 +179,11 @@ class TCPServerApp(QtWidgets.QMainWindow):
         parsed_message = message.split(";")
         if parsed_message[0] == "ping":
             self.tx_pong(client_full_address)
+        elif parsed_message[0] == "a":
+            self.tx_a(client_full_address)
+        elif parsed_message[0] == "b":
+            self.tx_b(client_full_address)
+
 
     def log_on_log(self, message):
         self.listWidget_log.addItem(message)
@@ -205,6 +210,19 @@ class TCPServerApp(QtWidgets.QMainWindow):
                 client_thread.client_socket.flush()
                 self.log_tx_message("pong", client_full_address)
     
+    def tx_a(self, client_full_address):
+        for client_thread in self.client_threads:
+            if client_thread.client_full_address == client_full_address:
+                client_thread.client_socket.write(f"a;{get_timestamp_tx()}".encode())
+                client_thread.client_socket.flush()
+                self.log_tx_message("a", client_full_address)
+
+    def tx_b(self, client_full_address):
+        for client_thread in self.client_threads:
+            if client_thread.client_full_address == client_full_address:
+                client_thread.client_socket.write(f"b;{get_timestamp_tx()}".encode())
+                client_thread.client_socket.flush()
+                self.log_tx_message("b", client_full_address)
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
